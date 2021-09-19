@@ -4,6 +4,11 @@ namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Auth;
+use Firebase\JWT\JWT;
+use App\Models\User;
+use Illuminate\Http\Request;
+
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -25,6 +30,14 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+        Auth::viaRequest('jwt', function (Request $request) {
+            try{
+                $tokenPayload = JWT::decode($request->bearerToken(), config('jwt.key'),  array('HS256'));
+
+                return User::findOrFail($tokenPayload->id);
+            } catch(\Exception $e){
+                return null;
+            }
+        });
     }
 }
