@@ -32,7 +32,7 @@ class AuthServiceProvider extends ServiceProvider
 
         Auth::viaRequest('jwt', function (Request $request) {
             try{
-                $tokenPayload = JWT::decode($request->bearerToken(), config('jwt.key'),  array('HS256'));
+                $tokenPayload = JWT::decode($request->bearerToken(), config('jwt.secret'),  config('jwt.algorithms'));
 
                 return User::findOrFail($tokenPayload->id);
             } catch(\Exception $e){
